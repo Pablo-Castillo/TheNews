@@ -1,0 +1,77 @@
+@startuml
+
+package "cl.ucn.disc.dsm.news" {
+
+    package "model" #c1f77f {
+
+        Class News <<Entity>>{
+
+            - id: Long
+            - title: String
+            - source: String
+            - author: String
+            - url: String
+            - urlImage: String
+            - description: String
+            - content: String
+
+            + News(..)
+            + getId(): String
+            + getTitle(): String
+            + getSource(): String
+            + getAuthor(): String
+            + getUrl(): String
+            + getUrlImage(): String
+            + getDescription(): String
+            + getContent(): String
+            + getPublishedAt(): String
+
+        }
+    }
+
+    package "services" #daabfa {
+
+        Interface Contracts {
+
+            + retrieveNews(size: Integer): List<News>
+            + saveNews(news: News): void
+
+        }
+
+        Class ContractsImplFaker {
+
+            - theNews: List<News>
+            + ContractsImplFaker()
+
+        }
+    }
+
+    package "com.github.javafaker" #fcc1ea {
+
+        Class Faker {
+            ...
+        }
+    }
+
+    package "org.slf4j" #fcc1ea {
+
+        Class Logger {
+            ...
+        }
+    }
+
+    package "org.threeten.bp" #fcc1ea {
+
+        Class ZonedDateTime {
+                ...
+        }
+    }
+}
+
+ContractsImplFaker ..|> Contracts
+Contracts ..>  News : <<use>>
+ContractsImplFaker ..> Faker : <<use>>
+News *--> ZonedDateTime : -PublishedAt
+ContractsImplFaker *--> Logger : -log
+
+@enduml
