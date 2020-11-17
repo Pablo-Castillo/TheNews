@@ -35,4 +35,14 @@ public class ContractsImpl implements Contracts {
 
         return news;
     }
+
+    /**
+     * Save one News into the System
+     *
+     * @param news to save
+     */
+    @Override
+    public void saveNews(News news) {
+
+    }
 }
