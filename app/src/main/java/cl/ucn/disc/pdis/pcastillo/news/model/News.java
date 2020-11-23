@@ -10,7 +10,11 @@
 
 package cl.ucn.disc.pdis.pcastillo.news.model;
 
+import net.openhft.hashing.LongHashFunction;
+
 import org.threeten.bp.ZonedDateTime;
+
+import cl.ucn.disc.pdis.pcastillo.news.utils.Validation;
 
 /**
  * The Domain model: News.
@@ -21,7 +25,7 @@ public final class News {
     /**
      * Unique id
      */
-    private long id;
+    private Long id;
 
     /**
      * The title
@@ -67,7 +71,7 @@ public final class News {
 
     /**
      *  The Constructor.
-     * @param id
+     *
      * @param title
      * @param source
      * @param author
@@ -77,15 +81,34 @@ public final class News {
      * @param content
      * @param publishedAt
      */
-    public News(long id, String title, String source, String author, String url, String urlImage, String description, String content, ZonedDateTime publishedAt) {
-        this.id = id;
+    public News(String title, String source, String author, String url, String urlImage, String description, String content, ZonedDateTime publishedAt) {
+
+        // Validacion title
+        Validation.minSize(title, 2, "title");
         this.title = title;
+
+        // Validacion source
+        Validation.minSize(source, 2, "source");
         this.source = source;
+
+        // Validacion author
+        Validation.minSize(author, 2, "author");
         this.author = author;
+
+        // Apply the hash xxHash function
+        this.id = LongHashFunction.xx()
+                .hashChars(title + "|" + source + "|" + author);
+
         this.url = url;
         this.urlImage = urlImage;
         this.description = description;
+
+        // Validacion content
+        Validation.notNull(content, "content");
         this.content = content;
+
+        // Validacion publishedAt
+        Validation.notNull(publishedAt, "publishedAt");
         this.publishedAt = publishedAt;
     }
 
@@ -93,7 +116,7 @@ public final class News {
      *
      * @return the Id
      */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
