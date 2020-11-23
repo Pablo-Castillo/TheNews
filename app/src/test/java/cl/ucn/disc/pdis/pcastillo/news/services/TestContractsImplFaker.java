@@ -87,10 +87,12 @@ public final class TestContractsImplFaker {
         Contracts contracts = new ContractsImplFaker();
 
         // Create a news
-        News news = new News(1, "Game", "PCGamer", "Anne", "www.pcgamer.com", "", "New Game", "This new game", ZonedDateTime.now());
+        News news = new News("Game", "PCGamer", "Anne", "www.pcgamer.com", "", "New Game", "This new game", ZonedDateTime.now());
 
         // Save the news
         contracts.saveNews(news);
+
+
 
     }
 
