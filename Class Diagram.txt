@@ -46,25 +46,44 @@ package "cl.ucn.disc.dsm.news" {
         }
     }
 
+    package "utils" #c1f6fc {
+
+        Class Validation {
+
+            + notNull(o: Object, message: String): void
+            + minSize(value: String, minSize: int, message: String): void
+        }
+    }
+}
+
+package "externals" #fcc1ea {
+
     package "com.github.javafaker" #fcc1ea {
 
         Class Faker {
-            ...
+           ...
         }
     }
 
     package "org.slf4j" #fcc1ea {
 
         Class Logger {
-            ...
+           ...
         }
     }
 
     package "org.threeten.bp" #fcc1ea {
 
         Class ZonedDateTime {
-                ...
+           ...
         }
+    }
+
+    package "net.openhft.hashing" #fcc1ea {
+
+       Class LongHashFunction {
+           ...
+       }
     }
 }
 
@@ -73,5 +92,7 @@ Contracts ..>  News : <<use>>
 ContractsImplFaker ..> Faker : <<use>>
 News *--> ZonedDateTime : -PublishedAt
 ContractsImplFaker *--> Logger : -log
+News ..> Validation
+News ..> LongHashFunction : <<use>>
 
 @enduml
