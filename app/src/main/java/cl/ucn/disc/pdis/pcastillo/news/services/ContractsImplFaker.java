@@ -10,8 +10,6 @@
 
 package cl.ucn.disc.pdis.pcastillo.news.services;
 
-import android.os.Build;
-
 import com.github.javafaker.Faker;
 
 import org.slf4j.Logger;
@@ -51,20 +49,16 @@ public class ContractsImplFaker implements Contracts {
 
         for (int i = 0; i < 5; i++) {
 
-            // API required 26 (current min 24) ??
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                this.theNews.add(new News(
-                        Integer.toUnsignedLong(i),
-                        faker.book().title(),
-                        faker.name().username(),
-                        faker.name().fullName(),
-                        faker.internet().url(),
-                        faker.internet().avatar(),
-                        faker.harryPotter().quote(),
-                        faker.lorem().paragraph(3),
-                        ZonedDateTime.now(ZoneId.of("-3"))
-                ));
-            }
+            this.theNews.add(new News(
+                    faker.book().title(),
+                    faker.name().username(),
+                    faker.name().fullName(),
+                    faker.internet().url(),
+                    faker.internet().avatar(),
+                    faker.harryPotter().quote(),
+                    faker.lorem().paragraph(3),
+                    ZonedDateTime.now(ZoneId.of("-3"))
+            ));
 
         }
 
