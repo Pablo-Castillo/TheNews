@@ -16,8 +16,26 @@ android {
     }
 
     buildTypes {
-        release {
+        /*
+        debug {
+            debuggable true
             minifyEnabled false
+            shrinkResourses false
+            zipAlignEnabled false
+            crunchPngs false
+            versionNameSuffix ".d"
+        }
+        */
+
+        release {
+            /*
+            debuggable false
+            minifyEnabled true
+            shrinkResourses true
+            zipAlignEnabled true
+            crunchPngs true
+            versionNameSuffix ".r"
+            */
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -25,6 +43,16 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    // Override the versionCode and VersionName
+    /*
+    android.applicationVeriants.all { variant ->
+        variant.outputs.each { output ->
+            output.versionCodeOverride = project.ext.buildTimestamp
+            output.versionNameOverride = project.ext.buildVersion + (variant.name == "debug" ? ".d" : ".r")
+        }
+    }
+    */
 }
 
 dependencies {
@@ -62,5 +90,14 @@ dependencies {
 
     // Hashing libraries: https://github.com/OpenHTF/Zero-Allocation-Hashing
     implementation 'net.openhft:zero-allocation-hashing:0.12'
+
+    // LeakCanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
+
+    // ACRA
+    def acraVersion = '5.7.0'
+    implementation "ch.acra:acra-http:$acraVersion"
+    implementation "ch.acra:acra-dialog:$acraVersion"
+
 
 }
