@@ -19,15 +19,37 @@
 
 package cl.ucn.disc.pdis.pcastillo.news;
 
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+import cl.ucn.disc.pdis.pcastillo.news.model.News;
+import cl.ucn.disc.pdis.pcastillo.news.services.ContracsImplNewsApi;
+import cl.ucn.disc.pdis.pcastillo.news.services.Contracts;
 
 /**
  * The main class
  * @author Pablo Castillo Rojas
  */
-public class MainActivity extends AppCompatActivity {
+public final class MainActivity extends AppCompatActivity {
+
+    /**
+     * The Logger
+     */
+    private static final Logger log = LoggerFactory.getLogger(MainActivity.class);
+
+    /**
+     * ListView
+     */
+    protected ListView listView;
 
     /**
      * OnCreate
@@ -37,6 +59,33 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        log.debug("onCreate ..");
         setContentView(R.layout.activity_main);
+
+        // Get ListView from layout
+        this.listView = findViewById(R.id.am_lv_news);
+
+        // Click one item
+        this.listView.setOnItemClickListener((parent, view, position, id) -> {
+            log.debug("Position: {}, Id: {}.", position, id);
+        });
+
+        // Running in background thread
+        AsyncTask.execute(()->{
+
+            // Using the contracts to get the news ..
+            Contracts contracts = new ContracsImplNewsApi("...");
+
+            // Get the News from NewsApi (internet)
+            List<News> news = contracts.retrieveNews(20);
+
+            // Build the simple adapter to populate the list
+            ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, news);
+
+            // ..update the listview in UiThread
+            runOnUiThread(() -> {
+                this.listView.setAdapter(adapter);
+            });
+        });
     }
 }
