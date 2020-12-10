@@ -21,16 +21,22 @@ package cl.ucn.disc.pdis.pcastillo.news;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.adapters.ModelAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import cl.ucn.disc.pdis.pcastillo.news.activities.NewsItem;
 import cl.ucn.disc.pdis.pcastillo.news.model.News;
 import cl.ucn.disc.pdis.pcastillo.news.services.ContracsImplNewsApi;
 import cl.ucn.disc.pdis.pcastillo.news.services.Contracts;
@@ -62,13 +68,16 @@ public final class MainActivity extends AppCompatActivity {
         log.debug("onCreate ..");
         setContentView(R.layout.activity_main);
 
-        // Get ListView from layout
-        this.listView = findViewById(R.id.am_lv_news);
+        // The fast adapter
+        ModelAdapter<News, NewsItem> newsAdapter = new ModelAdapter<>(NewsItem::new);
+        FastAdapter<NewsItem> fastAdapter = FastAdapter.with(newsAdapter);
+        fastAdapter.withSelectable(false);
 
-        // Click one item
-        this.listView.setOnItemClickListener((parent, view, position, id) -> {
-            log.debug("Position: {}, Id: {}.", position, id);
-        });
+        // The Recycler view
+        RecyclerView recyclerView = findViewById(R.id.am_rv_news);
+        recyclerView.setAdapter(fastAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         // Running in background thread
         AsyncTask.execute(()->{
@@ -77,14 +86,11 @@ public final class MainActivity extends AppCompatActivity {
             Contracts contracts = new ContracsImplNewsApi("...");
 
             // Get the News from NewsApi (internet)
-            List<News> news = contracts.retrieveNews(20);
-
-            // Build the simple adapter to populate the list
-            ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, news);
+            List<News> listNews = contracts.retrieveNews(30);
 
             // ..update the listview in UiThread
             runOnUiThread(() -> {
-                this.listView.setAdapter(adapter);
+                newsAdapter.add(listNews);
             });
         });
     }
