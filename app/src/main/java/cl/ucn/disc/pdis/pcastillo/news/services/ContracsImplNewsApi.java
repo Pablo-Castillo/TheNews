@@ -24,6 +24,11 @@ import org.threeten.bp.ZonedDateTime;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import cl.ucn.disc.pdis.pcastillo.news.model.News;
 import cl.ucn.disc.pdis.pcastillo.news.utils.Validation;
@@ -65,7 +70,7 @@ public class ContracsImplNewsApi implements Contracts {
         boolean needFix = false;
 
         // Fix the author null
-        if (article.getAuthor() == null) {
+        if (article.getAuthor() == null || article.getAuthor().length() == 0) {
 
             article.setAuthor("No author");
             needFix = true;
@@ -116,22 +121,37 @@ public class ContracsImplNewsApi implements Contracts {
     public List<News> retrieveNews(final Integer size) {
 
         try {
+
+            // Get the list of Article
             List<Article> articles = newsApiService.getTopHeadlines(
                     "Technology", size
             );
 
             // The list of Articles to List of News
-            List<News> news = new ArrayList<>();
+            List<News> rawNews = new ArrayList<>();
             for (Article article : articles) {
                 // log.debug("Article: {}", ToStringBuilder.reflectionToString(article, ToStringStyle.MULTI_LINE_STYLE));
-                news.add(toNews(article));
+                rawNews.add(toNews(article));
             }
-            return news;
+            return rawNews.stream()
+                    // Remove the duplicateds
+                    .filter(distintByKey(News::getId))
+                    // Order by date
+                    .sorted((k1, k2) -> k2.getPublishedAt().compareTo(k1.getPublishedAt()))
+                    .collect(Collectors.toList());
         } catch (IOException ex) {
 
-            log.error("Error: ", ex);
-            return null;
+            throw new RuntimeException(ex);
         }
+    }
+
+    /**
+     * The predicator to filter
+     */
+    private static <T> Predicate<T> distintByKey(Function<? super T, ?> keyExtractor) {
+
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     /**
