@@ -68,6 +68,9 @@ public final class MainActivity extends AppCompatActivity {
         log.debug("onCreate ..");
         setContentView(R.layout.activity_main);
 
+        // The Toolbar
+        this.setSupportActionBar(findViewById(R.id.am_t_toolbar));
+
         // The fast adapter
         ModelAdapter<News, NewsItem> newsAdapter = new ModelAdapter<>(NewsItem::new);
         FastAdapter<NewsItem> fastAdapter = FastAdapter.with(newsAdapter);
